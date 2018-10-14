@@ -11,19 +11,22 @@
         background: #000;
       }
       .m {
-        width: 1090px;
-        height: 790px;
+        position: relative;
+        z-index: 2;
+        width: 378px;
+        height: 279px;
         margin-top: 30px;
-        border: 10px solid lavender;
+        border: 3px solid lavender;
         background: fff;
       }
       #show {
         margin: auto;
         position: absolute;
         top: 0;
-        left: 20%;
+        left: 26%;
         right: 0;
         font-family: Courier New;
+        line-height: 9px;
         font-size: 16px;
         color: red;
       }
@@ -32,7 +35,7 @@
 <body>
   <!--video播放器盒子-->
   <div class="m">
-    <video id="my-video" class="video-js" controls preload="auto" width="1090" height="790"
+    <video id="my-video" class="video-js" controls preload="auto" width="378" height="279"
     data-setup="{}">
       <source src="./video/test.mp4" type="video/mp4">
       <p class="vjs-no-js">您的浏览器不支持video</p>
