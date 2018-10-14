@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html>
+<head lang="en">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no"/>
+    <title>Char Video</title>
+    <link href="css/video-js.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="css/index.css">
+    <style>
+      body {
+        background: #000;
+      }
+      .m {
+        width: 1090px;
+        height: 790px;
+        margin-top: 30px;
+        border: 10px solid lavender;
+        background: fff;
+      }
+      #show {
+        margin: auto;
+        position: absolute;
+        top: 0;
+        left: 20%;
+        right: 0;
+        font-family: Courier New;
+        font-size: 16px;
+        color: red;
+      }
+    </style>
+</head>
+<body>
+  <!--video播放器盒子-->
+  <div class="m">
+    <video id="my-video" class="video-js" controls preload="auto" width="1090" height="790"
+    data-setup="{}">
+      <source src="./video/test.mp4" type="video/mp4">
+      <p class="vjs-no-js">您的浏览器不支持video</p>
+    </video>
+    <script src="js/video.min.js"></script> 
+    <script src="http://vjs.zencdn.net/5.19/lang/zh-CN.js"></script>
+    <script type="text/javascript">
+      var myPlayer = videojs('my-video');
+      videojs("my-video").ready(function(){
+        var myPlayer = this;
+        myPlayer.play();
+      });    
+    </script> 
+  </div>
+  <!--放置转换-->
+  <pre id="show"></pre>
+  <!--选择操作区-->
+  <div class="operation">
+    <button class="btn blue" onclick="changeBlue()">蓝色</button>
+    <button class="btn red" onclick="changeRed()">红色</button>
+    <button class="btn yellow" onclick="changeYellow()">黄色</button>
+    <button class="btn randomcolor" onclick="changeRandom()">随机色</button>
+  </div>
+  <script>
+    var show = document.getElementById("show");
+    // 获取video对象
+    var video = document.getElementsByTagName("video")[0];
+
+    var interval, video = document.getElementsByTagName("video")[0],
+        show = document.getElementById("show"),
+        canvas = document.createElement("canvas"),
+        captureImage = function () {
+            var ctx;
+            canvas.width = video.videoWidth;
+            canvas.height = video.videoHeight;
+            if (canvas.width) {
+                ctx = canvas.getContext('2d');
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+                ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+                show.innerText = picToChars(ctx);
+            }
+        },
+        beginCapture = function () {
+            interval = setInterval(function () {
+                captureImage(1)
+            }, 100);
+        },
+        endCapture = function () {
+            if (interval) {
+                clearInterval(interval);
+            }
+        },
+        play = function () {
+            video.play();
+        };
+    video.addEventListener("play", beginCapture);
+    video.addEventListener("pause", endCapture);
+    video.addEventListener("ended", endCapture);
+    video.addEventListener("playing", function () {
+        endCapture();
+        beginCapture();
+    });
+
+    // 图片转字符方法
+    function picToChars(ctx) {
+      var pixels = [];
+      var output = "";
+      var charpic_width = canvas.width;
+      var charpic_height = canvas.height;
+      var imageData = ctx.getImageData(0, 0, charpic_width, charpic_height);
+      // 算出每行每个字符的宽度 = 总宽度 / 每行字符数（这里我先设定为每行100个）
+      var char_width = charpic_width / 100;
+      // 假设字符是个正方形 那么字符的宽度等于字符的高度。
+      var char_height = char_width;
+      // 算出有多少行字符，行数 = 总高度 / 字符的高度
+      var rows = charpic_height / char_height;
+      // 算出列数
+      var cols = 100;
+      // 算出对应的灰度值
+      getGray = function(x, y, w, h) {
+        var sumGray = 0;
+        var pixels;
+        for (var i = 0; i < w; i++) {
+          for (var j = 0; j < h; j++) {
+            var char_x = x + j;
+            var char_y = y + i;
+            var index = (char_y * imageData.width + char_x) * 4;
+            var data = imageData.data;
+            var R = data[index];
+            var G = data[index + 1];
+            var B = data[index + 2];
+            // 灰度计算公式
+            gray = ~~(R * 0.3 + G * 0.59 + B * 0.11)
+            sumGray += gray;
+          }
+        }
+        pixels = w * h;
+        return ~~(sumGray / pixels);
+      }
+
+      // 遍历行列填充字符
+      for (var i = 0; i < rows; i++) {
+        for (var j = 0; j < cols; j ++) {
+          var pos_x = ~~(j * char_width);
+          var pos_y = ~~(i * char_height);
+          var avg = getGray(pos_x, pos_y, ~~char_width, ~~char_height);
+          var map = getCharsMap();
+          var charText = map[avg];
+          output += charText;
+        }
+        output += "\r\n";
+      }
+      return output;
+    }
+
+    // 字符初始化方法
+    function getCharsMap() {
+      var chars = [' ','@','B','%','8','&','W','M','#','*','o','a','h','k','b','d','p','q','w',
+                  'm','Z','O','0','Q','L','C','J','U','Y','X','z','c','v','u','n','x','r','j','f','t',
+                  '.','$'];
+      var step = 25;
+      var map = {};
+      for (var i = 0; i < 256; i++) {
+        var index = ~~(i / 25);
+        map[i] = chars[index];
+      }
+      return map;
+    }
+    
+  // 操作方法(切换皮肤颜色)
+  function changeBlue() {
+    var showElem = document.getElementById('show');
+    showElem.style.color = 'skyblue';
+  }
+
+  function changeRed() {
+    var showElem = document.getElementById('show');
+    showElem.style.color = 'red';
+  }
+
+  function changeYellow() {
+    var showElem = document.getElementById('show');
+    showElem.style.color = 'yellow';
+  }
+
+  function changeRandom() {
+    var showElem = document.getElementById('show');
+    showElem.style.color = 'pink';
+  }
+  </script>
+</body>
+</html>

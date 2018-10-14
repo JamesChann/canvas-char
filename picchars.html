@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html>
+<head lang="en">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no"/>
+    <title>Char Picture多啦A梦</title>
+</head>
+<body>
+  <div style="width: 10px;height: 10px;background:red;"></div>
+  <img src="./images/pic.jpg" id="origin-img" style="border: 1px solid skyblue;"/>
+  <canvas id="myCanvas" width="250px" height="350px" style="border: 1px solid red;">
+    您的浏览器不支持canvas标签。
+  </canvas>
+  <pre id="show"></pre>
+  <script>
+    var show = document.getElementById("show");
+    var img = document.getElementById("origin-img");
+    //获取Canvas对象(画布)
+    var canvas = document.getElementById("myCanvas");
+    //简单地检测当前浏览器是否支持Canvas对象，以免在一些不支持html5的浏览器中提示语法错误
+    if(canvas.getContext){  
+     //获取对应的CanvasRenderingContext2D对象(画笔)
+     var ctx = canvas.getContext("2d");
+     //创建新的图片对象
+     var img = new Image();
+     //指定图片的URL
+     img.src = "./images/pic.jpg";
+     //浏览器加载图片完毕后再绘制图片
+     img.onload = function(){
+        //以Canvas画布上的坐标(10,10)为起始点，绘制图像
+        ctx.drawImage(img, 0, 0, 250, 350);
+        show.innerText=picToChars();           
+      };
+     }
+     
+    function picToChars() {
+      var pixels = [];
+      var output = "";
+      var charpic_width = 250;
+      var charpic_height = 350;
+      var imageData = ctx.getImageData(0, 0, charpic_width, charpic_height);
+      console.log(imageData);
+      // 算出每行每个字符的宽度 = 总宽度 / 每行字符数（这里我先设定为每行100个）
+      var char_width = charpic_width / 100;
+      // 假设字符是个正方形 那么字符的宽度等于字符的高度。
+      var char_height = char_width;
+      // 算出有多少行字符，行数 = 总高度 / 字符的高度
+      var rows = charpic_height / char_height;
+      // 算出列数
+      var cols = 100;
+      // 算出对应的灰度值
+      getGray = function(x, y, w, h) {
+        var sumGray = 0;
+        var pixels;
+        for (var i = 0; i < w; i++) {
+          for (var j = 0; j < h; j++) {
+            var char_x = x + j;
+            var char_y = y + i;
+            var index = (char_y * imageData.width + char_x) * 4;
+            var data = imageData.data;
+            var R = data[index];
+            var G = data[index + 1];
+            var B = data[index + 2];
+            // 灰度计算公式
+            gray = ~~(R * 0.3 + G * 0.59 + B * 0.11)
+            sumGray += gray;
+          }
+        }
+        pixels = w * h;
+        return ~~(sumGray / pixels);
+      }
+
+      // 遍历行列填充字符
+      for (var i = 0; i < rows; i++) {
+        for (var j = 0; j < cols; j ++) {
+          var pos_x = ~~(j * char_width);
+          var pos_y = ~~(i * char_height);
+          var avg = getGray(pos_x, pos_y, ~~char_width, ~~char_height);
+          var map = getCharsMap();
+          var charText = map[avg];
+          output += charText;
+        }
+        output += "\r\n";
+      }
+      return output;
+    }
+    
+    function getCharsMap() {
+      var chars = [' ','@','B','%','8','&','W','M','#','*','o','a','h','k','b','d','p','q','w',
+                  'm','Z','O','0','Q','L','C','J','U','Y','X','z','c','v','u','n','x','r','j','f','t',
+                  '.','$'];
+      var step = 25;
+      var map = {};
+      for (var i = 0; i < 256; i++) {
+        var index = ~~(i / 25);
+        map[i] = chars[index];
+      }
+      return map;
+    }
+
+  </script>
+</body>
+</html>

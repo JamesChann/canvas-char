@@ -1,0 +1,29 @@
+.operation {
+  margin-top: 50px;
+  margin-left: 30px;
+}
+.operation .btn {
+  display: block;
+  padding: 20px 60px;
+  border-radius: 20px;
+  margin-bottom: 50px;
+  color: #fff;
+  text-decoration: none;
+  cursor: pointer;
+  border: 0;
+}
+.operation .blue {
+  background: skyblue;
+}
+
+.operation .red {
+  background: red;
+}
+
+.operation .yellow {
+  background: yellow;
+}
+
+.operation .rendomcolor {
+  background: skyblue;
+}
