@@ -5,7 +5,7 @@
 
 演示
 ===
-:yum: 代码演示地址：[canvas-char](https://james-chann.github.io/canvas-char/)
+:yum: 代码演示地址：[canvas-char](https://jameschann.github.io/canvas-char/)
 
 > :diamond_shape_with_a_dot_inside: 最好使用谷歌浏览器，点击播放按钮即可播放视频。
 
